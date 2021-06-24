@@ -1,9 +1,9 @@
-from utils import compress_attention, create_mapping, BFS, build_graph, is_word
+from .utils import compress_attention, create_mapping, BFS, build_graph, is_word
 from multiprocessing import Pool
 import spacy
 import torch
 from transformers import AutoTokenizer, BertModel, GPT2Model
-from constant import invalid_relations_set
+from .constant import invalid_relations_set
 
 
 def process_matrix(
@@ -130,7 +130,6 @@ if __name__ == "__main__":
     import json
     from tqdm import tqdm
     import en_core_web_md
-
 
     nlp = en_core_web_md.load()
     selected_model = "gpt2-medium"

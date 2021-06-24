@@ -1,4 +1,4 @@
-from constant import invalid_relations_set
+from .constant import invalid_relations_set
 from statistics import mean
 import spacy
 

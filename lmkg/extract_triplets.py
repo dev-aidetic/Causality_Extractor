@@ -1,5 +1,5 @@
-from process import parse_sentence
-from mapper import Map, deduplication
+from .process import parse_sentence
+from .mapper import Map, deduplication
 from transformers import AutoTokenizer, BertModel, GPT2Model
 import os
 
@@ -32,7 +32,7 @@ def ExtractTriplets(sentences, tokenizer, encoder, nlp, use_cuda, threshold):
                     line = triplet["l"]
                     if conf < threshold:
                         continue
-                    mapped_triplet = Map(head, relations, tail,nlp)
+                    mapped_triplet = Map(head, relations, tail, nlp)
                     if "h" in mapped_triplet:
                         mapped_triplet["c"] = conf
                         mapped_triplet["sent"] = sentences[line]

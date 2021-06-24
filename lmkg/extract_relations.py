@@ -1,6 +1,7 @@
-from extract_triplets import ExtractTriplets
-from has_cause_mapper import MapHasCauseRelations
-from complete_head_tails import GetCompleteHeadTails
+from .extract_triplets import ExtractTriplets
+from .has_cause_mapper import MapHasCauseRelations
+from .complete_head_tails import GetCompleteHeadTails
+
 
 def ExtractRelations(
     sentences,
@@ -14,7 +15,7 @@ def ExtractRelations(
         sentences, tokenizer, encoder, nlp, use_cuda, threshold
     )
 
-    wiki_data_mapped_data = MapHasCauseRelations(lmkg_triplets,nlp)
+    wiki_data_mapped_data = MapHasCauseRelations(lmkg_triplets, nlp)
 
     mapped_only_data = []
     for triplet in wiki_data_mapped_data:

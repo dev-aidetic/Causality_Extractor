@@ -12,34 +12,31 @@ import spacy
 ################################ Loading Models ##############################
 
 try:
-    tokenizer = AutoTokenizer.from_pretrained(
-        "models/bert-large-cased"
-    )
+    tokenizer = AutoTokenizer.from_pretrained("models/bert-large-cased")
 
 except Exception as e:
-    print('Error in loading tokenizer from path')
-    print('downloading tokenizer')
+    print("Error in loading tokenizer from path")
+    print("downloading tokenizer")
     tokenizer = AutoTokenizer.from_pretrained("bert-large-cased")
 
 try:
-    encoder = BertModel.from_pretrained(
-    "models/bert-large-cased"
-    )
+    encoder = BertModel.from_pretrained("models/bert-large-cased")
 
 except Exception as e:
-    print('Error in loading encoder from path')
-    print('downloading encoder')
+    print("Error in loading encoder from path")
+    print("downloading encoder")
     encoder = BertModel.from_pretrained("bert-large-cased")
 
 
-nlp = spacy.load('en_core_web_sm')
+nlp = spacy.load("en_core_web_md")
 
 ############################### IMPORT CUSTOM PACKAGES ############################
-from rule_based_extractor.extract import GetCausalReln 
+from rule_based_extractor.extract import GetCausalReln
 from lmkg.extract_relations import ExtractRelations
 from utils import rearrange_result
 
 ############################### SECRET ID CHECK ############################
+
 
 def check_for_secret_id(request_data):
 
@@ -56,12 +53,14 @@ def check_for_secret_id(request_data):
         message = "Error while checking secret id: " + str(e)
         return False, message
 
+
 app = Flask(__name__)
 CORS(app)
 
 ###########################################################################
 # CAUSAL RELATIONSHIP EXTRACTOR
 ###########################################################################
+
 
 @app.route("/causal_relatonship_extractor", methods=["POST"])
 def causal_relatonship():
@@ -120,17 +119,18 @@ def causal_relatonship():
                     if lmkg:
                         lmkg_results = ExtractRelations(text, tokenizer, encoder, nlp)
                     if rule_based:
-                        CausalReln = GetCausalReln(nlp,
+                        CausalReln = GetCausalReln(
+                            nlp,
                             text,
                             np_link=np_link,
                             load_from_file=False,
                         )
                         rule_based_result = CausalReln.get_causal_relations()
-                    
-                    rearrange_result(text,mkg_results,rule_based_result)
 
                     temp_dict = {}
-                    temp_dict["processed_data"] = rearrange_result(lmkg_results,rule_based_result)
+                    temp_dict["processed_data"] = rearrange_result(
+                        text, lmkg_results, rule_based_result
+                    )
                 temp.append(temp_dict)
 
             data["complete_processed_data"] = temp
@@ -179,4 +179,4 @@ def causal_relatonship():
 
 if __name__ == "__main__":
 
-    app.run(host="0.0.0.0", port=8000, use_reloader=False, debug=True, threaded=True)
+    app.run(host="0.0.0.0", port=8081, use_reloader=False, debug=True, threaded=True)

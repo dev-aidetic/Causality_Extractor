@@ -1,9 +1,10 @@
 import spacy
 import re
 import nltk
-from extract_helper import RuleBasedExtractor
+from .extract_helper import RuleBasedExtractor
 import itertools
 import contractions
+
 mapper = {
     "caused by": 0,
     "driven by": 0,
@@ -17,8 +18,9 @@ mapper = {
     "result in": 1,
     "resulted in": 1,
     "causing in": 1,
-    "led to":1
+    "led to": 1,
 }
+
 
 def clean_text(raw_text):
     expanded_words = []
@@ -32,9 +34,12 @@ def clean_text(raw_text):
     clean_text = re.sub(r"\s+", " ", clean_text)
     return clean_text
 
-class GetCausalReln:
-    def __init__(self,nlp, txt_file, np_link=True, load_from_file=True, controlled=True):
 
+class GetCausalReln:
+    def __init__(
+        self, nlp, txt_file, np_link=True, load_from_file=True, controlled=True
+    ):
+        self.nlp = nlp
         self.txt_file = txt_file
         self.load_from_file = load_from_file
         self.controlled = controlled

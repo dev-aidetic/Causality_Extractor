@@ -2,6 +2,7 @@ import contractions
 import re
 import json
 
+
 def clean_text(raw_text):
     expanded_words = []
     for word in raw_text.split():
@@ -28,18 +29,20 @@ def GetCompleteHeadTails(mapped_data, nlp):
         if clean_sent in sent_heads_dict.keys():
             sent_heads_dict[clean_sent].append(clean_head)
             sent_tails_dict[clean_sent].append(clean_tail)
-            c_score_dict[clean_sent]['sum'] += data_dict["c"]
-            c_score_dict[clean_sent]['count'] += 1
+            c_score_dict[clean_sent]["sum"] += data_dict["c"]
+            c_score_dict[clean_sent]["count"] += 1
             continue
         sim_score_dict[clean_sent] = data_dict["mapped_relations"]["similarity_score"]
-        c_score_dict[clean_sent] = {"sum":data_dict["c"],"count":1}
+        c_score_dict[clean_sent] = {"sum": data_dict["c"], "count": 1}
         sent_heads_dict[clean_sent] = [clean_head]
         sent_tails_dict[clean_sent] = [clean_tail]
         sent_mapped_rel_dict[clean_sent] = data_dict["mapped_relations"][
             "wiki_data_relation"
         ][0]
     for clean_sent in c_score_dict:
-        c_score_dict[clean_sent] = (c_score_dict[clean_sent]["sum"]/c_score_dict[clean_sent]["count"])
+        c_score_dict[clean_sent] = (
+            c_score_dict[clean_sent]["sum"] / c_score_dict[clean_sent]["count"]
+        )
     final_data = []
     for sent in sent_heads_dict.keys():
         heads = [*{*sent_heads_dict[sent]}]
@@ -339,12 +342,10 @@ def GetCompleteHeadTails(mapped_data, nlp):
             "sentence": sent,
             "causes": cause,
             "effects": effect,
-            "confidence":c_score_dict[sent],
-            "similarity_score":sim_score_dict[sent]
+            "confidence": c_score_dict[sent],
+            "similarity_score": sim_score_dict[sent],
         }
         final_data.append(new_dict)
-    with open('final_data.json','w') as fp:
-        json.dump(final_data,fp,indent=2)
     return final_data
 
 
