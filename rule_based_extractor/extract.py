@@ -19,6 +19,8 @@ mapper = {
     "resulted in": 1,
     "causing in": 1,
     "led to": 1,
+    "leads to": 1,
+    "leading to": 1,
 }
 
 
@@ -91,6 +93,10 @@ class GetCausalReln:
                 txt = self.determine_structure(text, "by")
                 if txt:
                     sentences.append(txt)
+            elif re.search(rf"\bto\b", sentence):
+                txt = self.determine_structure(text, "by")
+                if txt:
+                    sentences.append(txt)
 
         return sentences
 
@@ -102,8 +108,14 @@ class GetCausalReln:
         for sentence in sent_text:
             for keyword in mapper:
                 if re.search(rf"\b{keyword}\b", sentence):
-                    comp = "by" if re.search(r" by", keyword) else "in"
-                    root = re.sub(r"( by)|( in)", "", keyword)
+                    comp = "by"
+                    if re.search(r" by", keyword):
+                        comp = "by"
+                    elif re.search(r" in", keyword):
+                        comp = "in"
+                    elif re.search(r" to", keyword):
+                        comp = "to"
+                    root = re.sub(rf" {comp}", "", keyword)
                     sentences.append({"sentence": sentence, "root": root, "comp": comp})
         sentences = [sentence_ for sentence_ in sentences if sentence_]
         return sentences
@@ -115,6 +127,7 @@ class GetCausalReln:
 
                 for line in f:
                     lines = line.strip()
+                    lines = lines.lower()
                     lines = self.nlp(lines).sents
                     for line in lines:
                         sents = self.identify_causal_sentences(line.text)
