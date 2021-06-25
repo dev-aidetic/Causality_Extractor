@@ -174,15 +174,15 @@ class GetCausalReln:
                     effect, cause = triplet_extractor.primary_triplet_extraction(
                         sents["sentence"], sents["root"], sents["comp"]
                     )
-                # if cause and effect:
-                relation_dict.append(
-                    {
-                        "sentence": clean_text(sents["sentence"]),
-                        "cause": cause,
-                        "effect": effect,
-                        "relation": sents["root"],
-                    }
-                )
+                if cause and effect:
+                    relation_dict.append(
+                        {
+                            "sentence": clean_text(sents["sentence"]),
+                            "cause": cause,
+                            "effect": effect,
+                            "relation": sents["root"],
+                        }
+                    )
             except Exception as e:
                 print(e)
                 print(sents)

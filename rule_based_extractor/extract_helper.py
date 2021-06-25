@@ -156,11 +156,10 @@ class RuleBasedExtractor:
 
                     if (
                         child.dep_ == "prep" and child in np_preps
-                    ):  # To handle multiple child preps to the root of the cause noun chunk
+                    ):  
 
                         prep_cause = child
 
-        # EFFECT PREPOSITION LINKING
 
         if prep_effect is not None or prep_cause is not None:
 
