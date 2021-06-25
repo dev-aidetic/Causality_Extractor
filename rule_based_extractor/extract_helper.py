@@ -31,8 +31,8 @@ class RuleBasedExtractor:
 
             return cause, effect
 
-    def passive_triplet_extraction(self, sent, ROOT_KEYWORD, comp="in"):
-        doc = self.nlp(sent)
+    def secondary_triplet_extraction(self, doc, ROOT_KEYWORD, comp, ROOT):
+
         cause = ""
         effect = ""
         prep_cause = None
@@ -42,10 +42,6 @@ class RuleBasedExtractor:
         np_preps = []
         np_list = []
         for token in doc:
-
-            if token.dep_ == "ROOT":
-                if token.text.lower() != ROOT_KEYWORD:
-                    return cause, effect
 
             if token.dep_ in ["nsubj", "nsubjpass"] and token.head.text == ROOT_KEYWORD:
 
@@ -61,39 +57,47 @@ class RuleBasedExtractor:
         for chunk in doc.noun_chunks:
 
             if (
-                chunk.root.dep_ in ["nsubj", "nsubjpass"]
-                and chunk.root.head.text == ROOT_KEYWORD
+                chunk.root.dep_ in ["nsubj", "nsubjpass", "ROOT"]
+                and chunk.root.head.text == ROOT
             ):
 
-                cause = str(chunk)
-                np_cause = str(chunk)
-
-            if chunk.root.head.text in comp:
                 effect = str(chunk)
                 np_effect = str(chunk)
+
+            if chunk.root.head.text == comp:
+                cause = str(chunk)
+                np_cause = str(chunk)
                 for child in chunk.root.children:
                     if child.dep_ == "acl":
-                        effect = " ".join([effect, str(child)])
+                        cause = " ".join([cause, str(child)])
 
                     if child.dep_ == "prep" and child in np_preps:
-                        prep_effect = child
+                        prep_cause = child
 
         # CAUSE PREPOSITION LINKING
 
-        if prep_cause is not None or prep_effect is not None:
+        if prep_effect is not None or prep_cause is not None:
 
-            effect, cause = self.prep_linking(
-                prep_cause, prep_effect, doc, effect, cause
+            cause, effect = self.prep_linking(
+                prep_effect, prep_cause, doc, cause, effect
             )
         if self.np_link:
-            if np_effect and np_effect == effect:
-                effect = self.np_linker(effect, np_effect, np_list, doc)
             if np_cause and np_cause == cause:
-                cause = self.np_linker(cause, np_effect, np_list, doc, 1)
+                cause = self.np_linker(cause, np_cause, np_list, doc)
+            if np_effect and np_cause and np_effect == effect:
+                effect = self.np_linker(effect, np_cause, np_list, doc, 1)
+
+        if not effect and cause:
+            for token in doc:
+                if token.dep_ in ["nsubj", "nsubjpass"] and token.head.text == ROOT:
+                    if "NOUN" in [
+                        child.pos_ for child in token.children
+                    ] and token.pos_ in ["ADV", "prep"]:
+                        effect = " ".join(a.text for a in token.subtree)
 
         return cause, effect
 
-    def active_triplet_extraction(self, sentence, ROOT_KEYWORD, comp="by"):
+    def primary_triplet_extraction(self, sentence, ROOT_KEYWORD, comp):
 
         doc = self.nlp(sentence)
 
@@ -105,12 +109,20 @@ class RuleBasedExtractor:
         np_effect = ""
         np_preps = []
         np_list = []
-
+        ticker = 0
         for token in doc:
 
             if token.dep_ == "ROOT":
                 if token.text.lower() != ROOT_KEYWORD:
-                    return cause, effect
+                    for child in token.children:
+                        if (
+                            child.dep_ in ["acl", "advcl"]
+                            and child.text == ROOT_KEYWORD
+                        ):
+                            ROOT = token.text
+                            return self.secondary_triplet_extraction(
+                                doc, ROOT_KEYWORD, comp, ROOT
+                            )
 
             # EFFECT PREPOSITION
 
@@ -160,6 +172,11 @@ class RuleBasedExtractor:
                 cause = self.np_linker(cause, np_cause, np_list, doc)
             if np_effect and np_effect == effect:
                 effect = self.np_linker(effect, np_cause, np_list, doc, 1)
+
+        if not cause and not effect:
+            return self.secondary_triplet_extraction(
+                doc, ROOT_KEYWORD, comp, ROOT_KEYWORD
+            )
 
         return cause, effect
 

@@ -39,7 +39,7 @@ def clean_text(raw_text):
 
 class GetCausalReln:
     def __init__(
-        self, nlp, txt_file, np_link=True, load_from_file=True, controlled=True
+        self, nlp, txt_file, np_link=True, load_from_file=False, controlled=True
     ):
         self.nlp = nlp
         self.txt_file = txt_file
@@ -161,27 +161,28 @@ class GetCausalReln:
         triplet_extractor = RuleBasedExtractor(self.nlp, self.np_link)
 
         print(sentences)
+        print("Total Number of input sentences :", len(sentences))
         for sents in sentences:
             try:
 
                 if mapper[sents["root"] + f" {sents['comp']}"] == 0:
-                    cause, effect = triplet_extractor.active_triplet_extraction(
+                    cause, effect = triplet_extractor.primary_triplet_extraction(
                         sents["sentence"], sents["root"], sents["comp"]
                     )
 
                 elif mapper[sents["root"] + f" {sents['comp']}"] == 1:
-                    cause, effect = triplet_extractor.passive_triplet_extraction(
+                    effect, cause = triplet_extractor.primary_triplet_extraction(
                         sents["sentence"], sents["root"], sents["comp"]
                     )
-                if cause and effect:
-                    relation_dict.append(
-                        {
-                            "sentence": clean_text(sents["sentence"]),
-                            "cause": cause,
-                            "effect": effect,
-                            "relation": sents["root"],
-                        }
-                    )
+                # if cause and effect:
+                relation_dict.append(
+                    {
+                        "sentence": clean_text(sents["sentence"]),
+                        "cause": cause,
+                        "effect": effect,
+                        "relation": sents["root"],
+                    }
+                )
             except Exception as e:
                 print(e)
                 print(sents)
