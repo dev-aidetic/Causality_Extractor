@@ -1,9 +1,15 @@
-from .utils import compress_attention, create_mapping, BFS, build_graph, is_word
+from kg_builder.utils import (
+    compress_attention,
+    create_mapping,
+    BFS,
+    build_graph,
+    is_word,
+)
 from multiprocessing import Pool
 import spacy
 import torch
 from transformers import AutoTokenizer, BertModel, GPT2Model
-from .constant import invalid_relations_set
+from kg_builder.constant import invalid_relations_set
 
 
 def process_matrix(
@@ -129,9 +135,8 @@ def parse_sentence(sentence, tokenizer, encoder, nlp, use_cuda=True):
 if __name__ == "__main__":
     import json
     from tqdm import tqdm
-    import en_core_web_md
 
-    nlp = en_core_web_md.load()
+    nlp = spacy.load("en_core_web_md")
     selected_model = "gpt2-medium"
 
     use_cuda = True
@@ -142,9 +147,17 @@ if __name__ == "__main__":
     if use_cuda:
         encoder = encoder.cuda()
 
-    target_file = ["../../Documents/KGERT-v2/datasets/squad_v1.1/train-v1.1.json"]
+    target_file = [
+        "../../Documents/KGERT-v2/datasets/squad_v1.1/train-v1.1.json",
+        # '../../Documents/KGERT-v2/datasets/squad_v1.1/wiki_dev_2020-18.json',
+        # '../../Documents/KGERT-v2/datasets/squad_v1/dev-v1.1.json',
+    ]
 
-    output_filename = ["train_v1.1.jsonl"]
+    output_filename = [
+        "train_v1.1.jsonl",
+        # 'wiki_2020-18.jsonl',
+        # 'dev-v1.1.jsonl',
+    ]
 
     for target_file, output_filename in zip(target_file, output_filename):
         with open(target_file, "r") as f:

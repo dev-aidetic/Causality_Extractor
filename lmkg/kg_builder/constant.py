@@ -1,39 +1,25 @@
 found_invalid = [
     "and",
-    "in",
-    "to",
     ",",
     "for",
-    "be",
-    "by",
+    "with",
     "on",
-    "as",
     "that",
     "from",
-    "be",
     ")",
     "(",
     "which",
     "at",
-    "be",
-    "be",
-    "be",
     ";",
     "or",
     "but",
-    "have",
-    "have",
     "the",
-    "have",
     "not",
     "after",
     '"',
-    "include",
     "also",
-    "be",
     "into",
     "between",
-    "such",
     ":",
     "do",
     "while",
@@ -41,6 +27,7 @@ found_invalid = [
     "during",
     "would",
     "over",
+    "since",
     "2019",
     "well",
     "than",
@@ -48,7 +35,6 @@ found_invalid = [
     "under",
     "where",
     "one",
-    "be",
     "hold",
     "2018",
     "can",
@@ -80,6 +66,7 @@ found_invalid = [
     "do",
     "follow",
     "most",
+    "although",
     "only",
     "—",
     "2007",
@@ -90,17 +77,18 @@ found_invalid = [
     "2017",
     "20",
     "2009",
-    "of",
-    "increase",
-    "decrease",
-    "think",
-    "even",
     "if",
-    "why",
+    "across",
 ]
 
 invalid_relations = [
-    #'and', 'but', 'or', 'so', 'because', 'when', 'before', 'although', # conjunction
+    "and",
+    "but",
+    "or",
+    "so",
+    "when",
+    "before",
+    "although",  # conjunction
     "oh",
     "wow",
     "ouch",
@@ -165,18 +153,6 @@ auxiliaries = [
     "need to",
     "ought to",
     "used to",
-    "am",
-    "are",
-    "is",
-    "was",
-    "were",
-    "being",
-    "could",
-    "doing",
-    "had",
-    "has",
-    "having",
-    "must",
 ]
 
 with open("corpus/english-adjectives.txt", "r") as f:
@@ -188,8 +164,8 @@ with open("corpus/adverbs.txt", "r") as f:
 # with open('corpus/Wordlist-Verbs-All.txt', 'r') as f:
 #     verbs = [ line.strip().lower() for line in f]
 
-# invalid_relations += adjectives
-# invalid_relations += adverbs
+invalid_relations += adjectives
+invalid_relations += adverbs
 # invalid_relations += verbs
 
-invalid_relations_set = set(invalid_relations + auxiliaries)
+invalid_relations_set = set(invalid_relations)
