@@ -14,8 +14,8 @@ MODEL_PATH = os.path.join(BASE_PATH, "data")
 
 RELATIONSHIP_THRESOLD = 0.8
 
-from kg_builder import process, mapper, stop_words
-from utils import utils  # , get_fasttext_vectors
+from ..kg_builder import process, mapper, stop_words
+from ..utils import utils  # , get_fasttext_vectors
 
 logger = utils.intialize_logging(__name__)
 
@@ -29,7 +29,9 @@ class RelationshipFinder:
         self.use_cuda = False
         self.threshold = 0.02
         try:
-            self.language_model = os.path.join(MODEL_PATH, self.language_model)
+            self.language_model = os.path.join(
+                MODEL_PATH, "models", self.language_model
+            )
             logger.info(f"Model path: {self.language_model}")
             logger.info(os.listdir(self.language_model))
             self.tokenizer = AutoTokenizer.from_pretrained(self.language_model)
@@ -44,26 +46,26 @@ class RelationshipFinder:
         self.encoder.eval()
         if self.use_cuda:
             self.encoder = self.encoder.cuda()
-
-        if os.path.exists("data/wiki_data_relation_embeddings_cause_md.npy"):
+        if os.path.exists(f"{MODEL_PATH}/wiki_data_relation_embeddings_cause_md.npy"):
             self.keyword_embeddings = np.load(
-                "data/wiki_data_relation_embeddings_cause_md.npy", allow_pickle=True
+                f"{MODEL_PATH}/wiki_data_relation_embeddings_cause_md.npy",
+                allow_pickle=True,
             )
             print(self.keyword_embeddings.shape)
         else:
             raise Exception("wikidata keyword embeddings is not present in data folder")
 
-        if os.path.exists("data/relations_dict_cause_md.npy"):
+        if os.path.exists(f"{MODEL_PATH}/relations_dict_cause_md.npy"):
             self.relations_dict = np.load(
-                "data/relations_dict_cause_md.npy", allow_pickle=True
+                f"{MODEL_PATH}/relations_dict_cause_md.npy", allow_pickle=True
             ).item()
             print(len(self.relations_dict))
         else:
             raise Exception("keyword to relation mapping is not present in data folder")
 
-        if os.path.exists("data/keywords_list_cause_md.npy"):
+        if os.path.exists(f"{MODEL_PATH}/keywords_list_cause_md.npy"):
             self.keyword_list = np.load(
-                "data/keywords_list_cause_md.npy", allow_pickle=True
+                f"{MODEL_PATH}/keywords_list_cause_md.npy", allow_pickle=True
             )
             print(self.keyword_list)
         else:
