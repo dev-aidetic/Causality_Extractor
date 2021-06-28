@@ -1,6 +1,6 @@
 import sys, os
-from kg_builder.process import parse_sentence
-from kg_builder.mapper import Map, deduplication
+from .process import parse_sentence
+from .mapper import Map, deduplication
 from transformers import AutoTokenizer, BertModel, GPT2Model
 import argparse
 import spacy

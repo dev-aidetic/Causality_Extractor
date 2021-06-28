@@ -1,4 +1,4 @@
-from kg_builder.utils import (
+from .utils import (
     compress_attention,
     create_mapping,
     BFS,
@@ -9,7 +9,7 @@ from multiprocessing import Pool
 import spacy
 import torch
 from transformers import AutoTokenizer, BertModel, GPT2Model
-from kg_builder.constant import invalid_relations_set
+from .constant import invalid_relations_set
 
 
 def process_matrix(

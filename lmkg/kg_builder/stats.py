@@ -1,4 +1,4 @@
-from kg_builder.utils import (
+from .utils import (
     compress_attention,
     create_mapping,
     BFS,

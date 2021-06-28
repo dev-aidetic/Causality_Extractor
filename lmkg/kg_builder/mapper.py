@@ -1,4 +1,4 @@
-from kg_builder.constant import invalid_relations_set
+from .constant import invalid_relations_set
 
 
 def Map(head, relations, tail, top_first=True, best_scores=True):

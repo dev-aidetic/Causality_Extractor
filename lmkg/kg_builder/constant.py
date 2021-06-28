@@ -155,10 +155,10 @@ auxiliaries = [
     "used to",
 ]
 
-with open("corpus/english-adjectives.txt", "r") as f:
+with open("lmkg/corpus/english-adjectives.txt", "r") as f:
     adjectives = [line.strip().lower() for line in f]
 
-with open("corpus/adverbs.txt", "r") as f:
+with open("lmkg/corpus/adverbs.txt", "r") as f:
     adverbs = [line.strip().lower() for line in f]
 
 # with open('corpus/Wordlist-Verbs-All.txt', 'r') as f:
