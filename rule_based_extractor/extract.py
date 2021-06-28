@@ -150,17 +150,11 @@ class GetCausalReln:
         else:
             sentences = []
             if self.controlled:
-                sentences.extend(
-                    self.identify_causal_sentences(text) for text in self.txt_file
-                )
-                sentences = list(itertools.chain.from_iterable(sentences))
+                sentences = self.identify_causal_sentences(self.txt_file)
             else:
-                sentences.extend(
-                    self.causal_sentence_finder(text) for text in self.txt_file
-                )
+                sentences = self.causal_sentence_finder(self.txt_file)
         triplet_extractor = RuleBasedExtractor(self.nlp, self.np_link)
 
-        print(sentences)
         print("Total Number of input sentences :", len(sentences))
         for sents in sentences:
             try:

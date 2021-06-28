@@ -6,33 +6,15 @@ import time
 import os
 import numpy as np
 import time
-from transformers import AutoTokenizer, BertModel
 import spacy
 
 ################################ Loading Models ##############################
-
-try:
-    tokenizer = AutoTokenizer.from_pretrained("models/bert-large-cased")
-
-except Exception as e:
-    print("Error in loading tokenizer from path")
-    print("downloading tokenizer")
-    tokenizer = AutoTokenizer.from_pretrained("bert-large-cased")
-
-try:
-    encoder = BertModel.from_pretrained("models/bert-large-cased")
-
-except Exception as e:
-    print("Error in loading encoder from path")
-    print("downloading encoder")
-    encoder = BertModel.from_pretrained("bert-large-cased")
-
-
 nlp = spacy.load("en_core_web_sm")
 
 ############################### IMPORT CUSTOM PACKAGES ############################
 from rule_based_extractor.extract import GetCausalReln
-from lmkg.extract_relations import ExtractRelations
+from lmkg.utils.utils import intialize_logging
+from lmkg.handler import triplet_handler
 from utils import rearrange_result
 
 ############################### SECRET ID CHECK ############################
@@ -117,7 +99,7 @@ def causal_relatonship():
                     lmkg_results = []
                     rule_based_result = []
                     if lmkg:
-                        lmkg_results = ExtractRelations(text, tokenizer, encoder, nlp)
+                        lmkg_results = triplet_handler.relationship_handler(text)
                     if rule_based:
                         CausalReln = GetCausalReln(
                             nlp,
@@ -128,9 +110,11 @@ def causal_relatonship():
                         rule_based_result = CausalReln.get_causal_relations()
 
                     temp_dict = {}
-                    temp_dict["processed_data"] = rearrange_result(
-                        text, lmkg_results, rule_based_result
-                    )
+                    temp_dict["processed_data"] = {}
+                    temp_dict["processed_data"]["lmkg_results"] = lmkg_results
+                    temp_dict["processed_data"][
+                        "rule_based_extractor_results"
+                    ] = rule_based_result
                 temp.append(temp_dict)
 
             data["complete_processed_data"] = temp

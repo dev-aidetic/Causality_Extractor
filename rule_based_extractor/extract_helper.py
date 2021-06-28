@@ -33,7 +33,6 @@ class RuleBasedExtractor:
             return cause, effect
 
     def secondary_triplet_extraction(self, doc, ROOT_KEYWORD, comp, ROOT):
-        print(1111)
 
         cause = ""
         effect = ""
