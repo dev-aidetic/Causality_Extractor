@@ -6,15 +6,19 @@ import time
 import os
 import numpy as np
 import time
+import requests
 import spacy
+import nltk
+
 
 ################################ Loading Models ##############################
-nlp = spacy.load("en_core_web_sm")
+nlp = spacy.load("en_core_web_md")
 
 ############################### IMPORT CUSTOM PACKAGES ############################
 from rule_based_extractor.extract import GetCausalReln
-from lmkg.utils.utils import intialize_logging
-from lmkg.handler import triplet_handler
+
+# from lmkg.utils.utils import intialize_logging
+# from lmkg.handler import triplet_handler
 from utils import rearrange_result
 
 ############################### SECRET ID CHECK ############################
@@ -97,9 +101,23 @@ def causal_relatonship():
                             rule_based = False
                     text = wd["text"]
                     lmkg_results = []
+
                     rule_based_result = []
                     if lmkg:
-                        lmkg_results = triplet_handler.relationship_handler(text)
+                        lmkg_results = {}
+                        lmkg_results["text"] = text
+                        lmkg_results["relations"] = []
+                        # lmkg_results = triplet_handler.relationship_handler(text)
+                        sent_text = nltk.sent_tokenize(text)
+                        for sent in sent_text:
+                            api_request = {"text": sent}
+
+                            lmkg_results_ = requests.post(
+                                "http://164.52.201.205:8000/lmkg_triplets",
+                                json=api_request,
+                            ).json()
+                            lmkg_results["relations"].extend(lmkg_results_["relations"])
+
                     if rule_based:
                         CausalReln = GetCausalReln(
                             nlp,
@@ -111,10 +129,15 @@ def causal_relatonship():
 
                     temp_dict = {}
                     temp_dict["processed_data"] = {}
-                    temp_dict["processed_data"]["lmkg_results"] = lmkg_results
-                    temp_dict["processed_data"][
-                        "rule_based_extractor_results"
-                    ] = rule_based_result
+                    (
+                        temp_dict["processed_data"][
+                            "attention_based_bert_causality_triplets"
+                        ],
+                        temp_dict["processed_data"][
+                            "dynamic_dependency_cardinality_mapper"
+                        ],
+                    ) = rearrange_result(lmkg_results, rule_based_result)
+
                 temp.append(temp_dict)
 
             data["complete_processed_data"] = temp
