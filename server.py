@@ -28,7 +28,7 @@ except Exception as e:
     encoder = BertModel.from_pretrained("bert-large-cased")
 
 
-nlp = spacy.load("en_core_web_md")
+nlp = spacy.load("en_core_web_sm")
 
 ############################### IMPORT CUSTOM PACKAGES ############################
 from rule_based_extractor.extract import GetCausalReln

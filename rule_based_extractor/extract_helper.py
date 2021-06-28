@@ -1,3 +1,4 @@
+from nltk.util import pr
 import spacy
 import re
 
@@ -32,6 +33,7 @@ class RuleBasedExtractor:
             return cause, effect
 
     def secondary_triplet_extraction(self, doc, ROOT_KEYWORD, comp, ROOT):
+        print(1111)
 
         cause = ""
         effect = ""
@@ -154,12 +156,9 @@ class RuleBasedExtractor:
                     if child.dep_ == "acl":
                         cause = " ".join([cause, str(child)])
 
-                    if (
-                        child.dep_ == "prep" and child in np_preps
-                    ):  
+                    if child.dep_ == "prep" and child in np_preps:
 
                         prep_cause = child
-
 
         if prep_effect is not None or prep_cause is not None:
 
