@@ -123,6 +123,7 @@ class RelationshipFinder:
                     if (i["wikidata_relation"] != "NO_MATCH")
                     and (" ".join(i["r"]) not in stop_words.stop_words_list)
                 ]
+                output_triplets = self.relationship_merger(output_triplets)
 
             return output_triplets
         else:
@@ -157,3 +158,88 @@ class RelationshipFinder:
             return "NO_MATCH", 0
         else:
             return "NO_MATCH", 0
+
+    def relationship_merger(self, triplet_output: dict):
+        """Reformat and merge relationships in relationship output
+
+        Args:
+            triplet_output (dict): triplet output
+        """
+        if triplet_output["relations"]:
+            proc_tripet = {"relations": [], "text": triplet_output["text"]}
+            unique_sent = set(
+                [triple["sent"] for triple in triplet_output["relations"]]
+            )
+            for sent in unique_sent:
+                new_relation = []
+                print("sent: ", sent)
+                rel = {
+                    "c": round(
+                        np.mean(
+                            [
+                                i["c"]
+                                for i in triplet_output["relations"]
+                                if i["sent"] == sent
+                            ]
+                        ),
+                        2,
+                    ),
+                    "h": [
+                        i["h"] for i in triplet_output["relations"] if i["sent"] == sent
+                    ],
+                    "r": [],
+                    "t": [
+                        i["t"] for i in triplet_output["relations"] if i["sent"] == sent
+                    ],
+                    "wikidata_relation": [],
+                    "wikidata_relation_score": round(
+                        np.mean(
+                            [
+                                i["wikidata_relation_score"]
+                                for i in triplet_output["relations"]
+                                if i["sent"] == sent
+                            ]
+                        ),
+                        2,
+                    ),
+                    "sent": sent,
+                }
+                for i in triplet_output["relations"]:
+                    if i["sent"] == sent:
+                        rel["r"].extend(i["r"])
+                        rel["wikidata_relation"].extend(i["wikidata_relation"])
+                rel["r"] = list(set(rel["r"]))
+                rel["h"] = self.find_phrase(set(rel["h"]), sent)
+                rel["t"] = self.find_phrase(set(rel["t"]), sent)
+                rel["wikidata_relation"] = list(set(rel["wikidata_relation"]))
+
+                new_relation.append(rel)
+                proc_tripet["relations"].extend(new_relation)
+
+        else:
+            proc_tripet = triplet_output
+            proc_tripet_tail = triplet_output
+        return proc_tripet
+
+    def find_phrase(self, keywords: list, sent: str):
+        proc_sent = utils.clean_text(sent, [])
+        # proc_sent = sent
+        ids = []
+        len_word = []
+        print(sent)
+        print(proc_sent)
+        delta = 0
+        for word in keywords:
+            try:
+                ids.append(proc_sent.index(word))
+                len_word.append(len(word))
+            except Exception as e:
+                print(e)
+                word = word.split(" ")[-1]
+                ids.append(proc_sent.index(word))
+                len_word.append(len(word))
+
+        s_idx = min(ids)
+        e_idx = max(ids)
+        len_idx = [lw for id, lw in zip(ids, len_word) if id == max(ids)][-1]
+        return sent[s_idx : e_idx + len_idx]
